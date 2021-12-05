@@ -9,13 +9,10 @@ Python version: 3.9
 import os
 import pandas as pd
 import warnings
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
+import visualize as vis
 
 warnings.simplefilter("ignore")
-plt.style.use('seaborn-whitegrid')
-sns.set()
 pd.set_option('display.max_columns', None)
 
 
@@ -28,16 +25,18 @@ def get_data(file_name, all_df=[]):
     """
     files = os.listdir('./data/' + file_name + '')  # Files available in the directory
     print(files)
+    # all_state = []
     for file in range(len(files)):
         if file_name == 'population':  # Reading all files from folder named "population"
-            year = files[file].split('_')[1].split('.')[
-                0]  # Splitting year from filename to include as a column in dataframe
+            # Splitting year from filename to include as a column in dataframe
+            year = files[file].split('_')[1].split('.')[0]
             df = files[file]
             df = pd.read_csv('data/' + file_name + '/' + files[file] + '', skiprows=2)
             df['Year'] = year
             indexNames = df[df['Location'] == 'Notes'].index[0]
             df = df.iloc[:indexNames - 1, :]  # Removing extra rows
             df.drop(df.index[df['Location'] == 'United States'], inplace=True)  # Dropping the total row
+
         elif file_name == 'unemployment':
             df = files[file]
             df = pd.read_excel('data/' + file_name + '/' + files[file] + '', skiprows=10, engine='openpyxl')
@@ -61,85 +60,35 @@ def get_data(file_name, all_df=[]):
 
             df = df.drop(hatecrime_drop_columns, axis=1)  # Dropping columns which are not required
 
-            df = df[['DATA_YEAR', 'STATE_NAME', 'REGION_NAME', 'OFFENDER_RACE', 'VICTIM_COUNT']]
+            # hatecrime_filter_df = df[['DATA_YEAR', 'STATE_NAME', 'REGION_NAME', 'OFFENDER_RACE', 'VICTIM_COUNT']]
         else:
             pass
     all_df.append(df)
+    # print('all_df:',all_df)
     dfs = pd.concat(all_df)
+    # print('dfs:',dfs)
     all_df.clear()
     return dfs
 
 
 if __name__ == '__main__':
-    # Reading data
+    # Reading data from the folder
     unemployment_df = get_data('unemployment')
     population_df = get_data('population')
     hatecrime_df = get_data('hatecrime')
 
-    print(hatecrime_df.head())
-    # Population plot - Seaborn - Different Races
-    population_df['Asian %'] = (population_df['Asian'] / population_df['Total']) * 100
-    population_df['Black %'] = (population_df['Black'] / population_df['Total']) * 100
-    population_df['White %'] = (population_df['White'] / population_df['Total']) * 100
-    population_df['Hispanic %'] = (population_df['Hispanic'] / population_df['Total']) * 100
+    # Visualization of dataset
+    population_plot = vis.visualize_population(population_df)
+    population_plot.show()
 
-    fig, axes = plt.subplots(2, 2, figsize=(18, 21))
-    axes = axes.flatten()
-    sns.barplot(x='Asian %', y='Location', data=population_df, ax=axes[0])
-    sns.barplot(x='Black %', y='Location', data=population_df, ax=axes[1])
-    sns.barplot(x='White %', y='Location', data=population_df, ax=axes[2])
-    sns.barplot(x='Hispanic %', y='Location', data=population_df, ax=axes[3])
-    # axes[0].set_title("Asian")
-    # axes[1].set_title("Black")
-    plt.suptitle("Population Rate")
-    plt.show()
+    hatecrime_offender_plot = vis.visualize_hatecrime(hatecrime_df, 'offender race')
+    hatecrime_offender_plot.show()
 
-    # Unemployment plot - Seaborn
-    plt.figure(figsize=(15, 10))
-    unemployment_df['unemployment %'] = unemployment_df['unemployment'] / unemployment_df['unemployment'].sum() * 100
-    sns.barplot(x="Year", y="unemployment %", data=unemployment_df)
-    plt.title('Unemployment Rate')
-    plt.grid(True)
-    plt.show()
+    hatecrime_victim_count_plot = vis.visualize_hatecrime(hatecrime_df, 'victim count')
+    hatecrime_victim_count_plot.show()
 
-    # Hatecrime plot - Seaborn
-    plt.figure(figsize=(20, 10))
-    # hatecrime_df_2020 = hatecrime_df[hatecrime_df['DATA_YEAR'] == 2020]
-    hatecrime_df['OFFENDER_RACE_COUNT'] = hatecrime_df.groupby('OFFENDER_RACE')['OFFENDER_RACE'].transform('count')
-    sns.barplot(x="OFFENDER_RACE_COUNT", y="OFFENDER_RACE", data=hatecrime_df)
-    plt.title('Offender Race')
-    plt.grid(True)
-    plt.show()
+    # hatecrime_antiasian_victim_count_plot = visualize_hatecrime(hatecrime_df, 'anti-asian')
+    # hatecrime_antiasian_victim_count_plot.show()
 
-    # Hatecrime plot - Seaborn - Victim
-    plt.figure(figsize=(15, 10))
-    hatecrime_df['VICTIMS COUNT'] = hatecrime_df.groupby('DATA_YEAR')['VICTIM_COUNT'].transform('count')
-    sns.barplot(x="DATA_YEAR", y="VICTIMS COUNT", data=hatecrime_df)
-    plt.title('VICTIM COUNT')
-    plt.grid(True)
-    plt.show()
-
-    # # Population plot - Seaborn - Asian
-    # plt.figure(figsize=(12, 15))
-    # population_df['Asian %'] = (population_df['Asian'] / population_df['Total']) * 100
-    # sns.barplot(x="Asian %", y="Location", data=population_df, orient='h')
-    # plt.show()
-    #
-    # # Population plot - Matplotlib
-    # plt.figure(figsize=(20, 20))
-    # population_df['Asian_percent'] = (population_df['Asian'] / population_df['Total']) * 100
-    # plt.xlabel('Population %')
-    # plt.ylabel('Location')
-    # plt.title('Population Rate')
-    # plt.grid(True)
-    # plt.barh(population_df['Location'], population_df['Asian_percent'])
-    # plt.show()
-    #
-    # # Unemployment plot
-    # unemployment_df['unemployment_%'] = unemployment_df['unemployment'] / unemployment_df['unemployment'].sum() * 100
-    # plt.bar(unemployment_df['Year'], unemployment_df['unemployment_%'])
-    # plt.xlabel('Year')
-    # plt.ylabel('Unemployment %')
-    # plt.title('Unemployment Rate')
-    # plt.grid(True)
-    # plt.show()
+    unemployment_plot = vis.visualize_unemployment(unemployment_df)
+    unemployment_plot.show()
