@@ -39,11 +39,13 @@ def get_data(file_name, all_df=[]):
 
         elif file_name == 'unemployment':
             df = files[file]
+            state = df.split('.')[0]
             df = pd.read_excel('data/' + file_name + '/' + files[file] + '', skiprows=10, engine='openpyxl')
             indexNames = df[df['Year'] == 2021.0].index[0]
+            df['STATE_NAME'] = state
             df = df.iloc[:indexNames - 1, :]  # Dropping the rows containing data of year 2021 since we are
             # considering previous 10 years data (2011-2020)
-            df = df[['Year', 'unemployment']]  # Filtering the requried columns
+            df = df[['Year', 'unemployment', 'STATE_NAME']]  # Filtering the requried columns
 
         elif file_name == 'hatecrime':
             df = files[file]
@@ -79,16 +81,20 @@ if __name__ == '__main__':
 
     # Visualization of dataset
     population_plot = vis.visualize_population(population_df)
-    population_plot.show()
-
     hatecrime_offender_plot = vis.visualize_hatecrime(hatecrime_df, 'offender race')
-    hatecrime_offender_plot.show()
-
     hatecrime_victim_count_plot = vis.visualize_hatecrime(hatecrime_df, 'victim count')
-    hatecrime_victim_count_plot.show()
-
-    # hatecrime_antiasian_victim_count_plot = visualize_hatecrime(hatecrime_df, 'anti-asian')
-    # hatecrime_antiasian_victim_count_plot.show()
-
+    # hatecrime_antiasian_victim_count_plot = vis.visualize_hatecrime(hatecrime_df, 'anti-asian')
     unemployment_plot = vis.visualize_unemployment(unemployment_df)
-    unemployment_plot.show()
+
+    # hatecrime_filterdata = hatecrime_df[['DATA_YEAR', 'STATE_NAME', 'OFFENDER_RACE', '']]
+
+    hatecrime_unemployment = hatecrime_df.merge(unemployment_df,
+                                                how='inner',
+                                                left_on=['DATA_YEAR', 'STATE_NAME'],
+                                                right_on=['Year', 'STATE_NAME'])
+
+    hatecrime_population = hatecrime_df.merge(population_df,
+                                              how='inner',
+                                              left_on=['DATA_YEAR', 'STATE_NAME'],
+                                              right_on=['Year', 'Location'])
+
