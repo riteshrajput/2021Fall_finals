@@ -24,20 +24,18 @@ def visualize_population(population_dataframe):
     fig, axes = plt.subplots(2, 2, figsize=(25, 30))
     axes = axes.flatten()
 
-    chart_asian = sns.barplot(x='Asian %', y='Location', data=population_dataframe, ax=axes[0])
-    chart_asian.bar_label(chart_asian.containers[0])
+    asian_state = sns.barplot(x='Asian %', y='Location', data=population_dataframe, ax=axes[0])
+    asian_state.bar_label(asian_state.containers[0])
 
-    chart_black = sns.barplot(x='Black %', y='Location', data=population_dataframe, ax=axes[1])
-    chart_black.bar_label(chart_black.containers[0])
+    black_state = sns.barplot(x='Black %', y='Location', data=population_dataframe, ax=axes[1])
+    black_state.bar_label(black_state.containers[0])
 
-    chart_white = sns.barplot(x='White %', y='Location', data=population_dataframe, ax=axes[2])
-    chart_white.bar_label(chart_white.containers[0])
+    white_state = sns.barplot(x='White %', y='Location', data=population_dataframe, ax=axes[2])
+    white_state.bar_label(white_state.containers[0])
 
-    chart_hispanic = sns.barplot(x='Hispanic %', y='Location', data=population_dataframe, ax=axes[3])
-    chart_hispanic.bar_label(chart_hispanic.containers[0])
+    hispanic_state = sns.barplot(x='Hispanic %', y='Location', data=population_dataframe, ax=axes[3])
+    hispanic_state.bar_label(hispanic_state.containers[0])
 
-    # axes[0].set_title("Asian")
-    # axes[1].set_title("Black")
     plt.suptitle("POPULATION RATE IN USA")
     plt.show()
     return plt
@@ -52,7 +50,6 @@ def visualize_hatecrime(hatecrime_dataframe, column_name):
     """
     if column_name == 'offender race':
         plt.figure(figsize=(20, 10))
-        hatecrime_df_2020 = hatecrime_dataframe[hatecrime_dataframe['DATA_YEAR'] == 2020]
         hatecrime_dataframe['OFFENDER_RACE_COUNT'] = hatecrime_dataframe.groupby('OFFENDER_RACE')[
             'OFFENDER_RACE'].transform('count')
         ax = sns.barplot(x="OFFENDER_RACE_COUNT", y="OFFENDER_RACE", data=hatecrime_dataframe)
@@ -77,8 +74,6 @@ def visualize_hatecrime(hatecrime_dataframe, column_name):
         # anti_asian = hatecrime_dataframe[hatecrime_dataframe['BIAS_DESC'] == 'Anti-Asian'].count()
 
         hatecrime_dataframe.groupby(['DATA_YEAR', 'BIAS_DESC'])
-        hatecrime_dataframe.groupby('')
-
         hatecrime_dataframe['BIAS_DESC_COUNT'] = hatecrime_dataframe.groupby('DATA_YEAR')['BIAS_DESC'].transform('sum')
         hatecrime_dataframe = hatecrime_dataframe[hatecrime_dataframe['BIAS_DESC'] == 'Anti-Asian']
         hatecrime_dataframe_asian = hatecrime_dataframe[['DATA_YEAR', 'BIAS_DESC']]
@@ -95,16 +90,86 @@ def visualize_unemployment(unemployment_dataframe):
     """
     Function to plot charts for unemployment dataset
     :param unemployment_dataframe: Unemployment dataframe
-    :return: Bar plot of unemploymeny vs year
+    :return: Bar plot of unemployment vs year
     """
     unemployment_dataframe['unemployment %'] = unemployment_dataframe['unemployment'] / unemployment_dataframe[
         'unemployment'].sum() * 100
-    # fig, axes = plt.subplots(1, 2, figsize=(18, 21))
-    # axes = axes.flatten()
     plt.figure(figsize=(20, 10))
     sns.barplot(x="Year", y="unemployment %", data=unemployment_dataframe)
-    # sns.barplot(x="unemployment %", y="State", data=unemployment_dataframe, ax=axes[1])
     plt.title("Unemployment Rate")
     plt.grid(True)
     plt.show()
     return plt
+
+
+def visualize_hatecrime_unemployment(hatecrime_unemployment_dataframe):
+    """
+    Function to plot data of merged dataset (hatecrime and unemployment)
+    :param hatecrime_unemployment_dataframe: Merged dataset of hatecrime and unemployment
+    :return: Bar plot of the unemployment rate, victims count, offender race count Vs State
+    """
+    fig, axes = plt.subplots(1, 3, figsize=(50, 25))
+    axes = axes.flatten()
+
+    unemployment_state = sns.barplot(x='unemployment %', y='state',
+                                     data=hatecrime_unemployment_dataframe, ax=axes[0])
+    unemployment_state.bar_label(unemployment_state.containers[0])
+
+    ue_victims_count_state = sns.barplot(x='VICTIMS COUNT', y='state',
+                                         data=hatecrime_unemployment_dataframe, ax=axes[1])
+    ue_victims_count_state.bar_label(ue_victims_count_state.containers[0])
+
+    ue_offender_race_count_state = sns.barplot(x='OFFENDER_RACE_COUNT', y='state',
+                                               data=hatecrime_unemployment_dataframe, ax=axes[2])
+    ue_offender_race_count_state.bar_label(ue_offender_race_count_state.containers[0])
+    plt.show()
+    return plt
+
+
+def visualize_hatecrime_population(hatecrime_population_dataframe, race):
+    """
+    Function to plot data of merged dataset (hatecrime and population)
+    :param hatecrime_population_dataframe: Merged dataset of hatecrime and population
+    :return: Bar plot of the different state, victims count, offender race count Vs State
+    """
+    fig, axes = plt.subplots(1, 3, figsize=(50, 25))
+    axes = axes.flatten()
+
+    # different_races_rate = ['Asian %', 'Black %', 'Hispanic %', 'White %']
+
+    # for r in different_races_rate:
+    #     race_state = sns.barplot(x=r, y='STATE_NAME',
+    #                              data=hatecrime_population_dataframe, ax=axes[0])
+    #     race_state.bar_label(race_state.containers[0])
+
+    if race == 'asian':
+        race_state = sns.barplot(x='Asian %', y='STATE_NAME',
+                                 data=hatecrime_population_dataframe, ax=axes[0])
+        race_state.bar_label(race_state.containers[0])
+
+    elif race == 'black':
+        race_state = sns.barplot(x='Black %', y='STATE_NAME',
+                                 data=hatecrime_population_dataframe, ax=axes[0])
+        race_state.bar_label(race_state.containers[0])
+
+    elif race == 'hispanic':
+        race_state = sns.barplot(x='Hispanic %', y='STATE_NAME',
+                                 data=hatecrime_population_dataframe, ax=axes[0])
+        race_state.bar_label(race_state.containers[0])
+
+    elif race == 'white':
+        race_state = sns.barplot(x='White %', y='STATE_NAME',
+                                 data=hatecrime_population_dataframe, ax=axes[0])
+        race_state.bar_label(race_state.containers[0])
+
+    po_victims_count_state = sns.barplot(x='VICTIMS COUNT', y='STATE_NAME',
+                                         data=hatecrime_population_dataframe, ax=axes[1])
+    po_victims_count_state.bar_label(po_victims_count_state.containers[0])
+
+    po_offender_race_count_state = sns.barplot(x='OFFENDER_RACE_COUNT', y='STATE_NAME',
+                                               data=hatecrime_population_dataframe, ax=axes[2])
+    po_offender_race_count_state.bar_label(po_offender_race_count_state.containers[0])
+
+    plt.show()
+    return plt
+
