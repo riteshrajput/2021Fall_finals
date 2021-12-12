@@ -59,27 +59,23 @@ def visualize_hatecrime(hatecrime_dataframe, column_name):
         plt.grid(True)
 
     elif column_name == 'victim count':
-        plt.figure(figsize=(15, 10))
         hatecrime_dataframe['VICTIMS COUNT'] = hatecrime_dataframe.groupby('DATA_YEAR')['VICTIM_COUNT'].transform(
             'count')
-        ax = sns.barplot(x="DATA_YEAR", y="VICTIMS COUNT", data=hatecrime_dataframe)
+
+        plt.figure(figsize=(20, 10))
+        ax = sns.lineplot(x="DATA_YEAR", y="VICTIMS COUNT", data=hatecrime_dataframe)
         ax.set(xlabel='YEAR', ylabel='VICTIMS COUNT"')
-        ax.bar_label(ax.containers[0])
         plt.title('NUMBERS OF VICTIM OVER THE YEARS')
         plt.grid(True)
 
     elif column_name == 'anti-asian':
-        # hatecrime_dataframe['Asian'] = hatecrime_dataframe[hatecrime_dataframe['BIAS_DESC'] == 'Anti-Asian']
-        # hatecrime_dataframe['Anti-Asian'] = hatecrime_dataframe.groupby('DATA_YEAR')['Asian'].transform('count')
-        # anti_asian = hatecrime_dataframe[hatecrime_dataframe['BIAS_DESC'] == 'Anti-Asian'].count()
+        hatecrime_dataframe_as = hatecrime_dataframe[['DATA_YEAR', 'BIAS_DESC', 'VICTIM_COUNT']]
+        hatecrime_dataframe_as = hatecrime_dataframe_as[hatecrime_dataframe_as['BIAS_DESC'] == 'Anti-Asian']
+        hatecrime_dataframe_as = hatecrime_dataframe_as.groupby(['DATA_YEAR','BIAS_DESC'], as_index=False)['VICTIM_COUNT'].sum()
 
-        hatecrime_dataframe.groupby(['DATA_YEAR', 'BIAS_DESC'])
-        hatecrime_dataframe['BIAS_DESC_COUNT'] = hatecrime_dataframe.groupby('DATA_YEAR')['BIAS_DESC'].transform('sum')
-        hatecrime_dataframe = hatecrime_dataframe[hatecrime_dataframe['BIAS_DESC'] == 'Anti-Asian']
-        hatecrime_dataframe_asian = hatecrime_dataframe[['DATA_YEAR', 'BIAS_DESC']]
-        ax = sns.barplot(x='DATA_YEAR', y='BIAS_DESC', data=hatecrime_dataframe_asian)
+        plt.figure(figsize=(20, 10))
+        ax = sns.lineplot(x="DATA_YEAR", y="VICTIM_COUNT", data=hatecrime_dataframe_as)
         ax.set(xlabel='YEAR', ylabel='Anti-Asian Victim Count')
-        ax.bar_label(ax.containers[0])
         plt.title('NUMBERS OF ANTI-ASIAN VICTIM OVER THE YEARS')
         plt.grid(True)
         plt.show()
@@ -108,20 +104,19 @@ def visualize_hatecrime_unemployment(hatecrime_unemployment_dataframe):
     :param hatecrime_unemployment_dataframe: Merged dataset of hatecrime and unemployment
     :return: Bar plot of the unemployment rate, victims count, offender race count Vs State
     """
-    fig, axes = plt.subplots(1, 3, figsize=(50, 25))
+    fig, axes = plt.subplots(1, 2, figsize=(50, 25))
     axes = axes.flatten()
 
     unemployment_state = sns.barplot(x='unemployment %', y='state',
                                      data=hatecrime_unemployment_dataframe, ax=axes[0])
     unemployment_state.bar_label(unemployment_state.containers[0])
 
+    hatecrime_unemployment_dataframe = hatecrime_unemployment_dataframe[hatecrime_unemployment_dataframe['BIAS_DESC'] == 'Anti-Asian']
+
     ue_victims_count_state = sns.barplot(x='VICTIMS COUNT', y='state',
                                          data=hatecrime_unemployment_dataframe, ax=axes[1])
     ue_victims_count_state.bar_label(ue_victims_count_state.containers[0])
 
-    ue_offender_race_count_state = sns.barplot(x='OFFENDER_RACE_COUNT', y='state',
-                                               data=hatecrime_unemployment_dataframe, ax=axes[2])
-    ue_offender_race_count_state.bar_label(ue_offender_race_count_state.containers[0])
     plt.show()
     return plt
 
@@ -132,15 +127,8 @@ def visualize_hatecrime_population(hatecrime_population_dataframe, race):
     :param hatecrime_population_dataframe: Merged dataset of hatecrime and population
     :return: Bar plot of the different state, victims count, offender race count Vs State
     """
-    fig, axes = plt.subplots(1, 3, figsize=(50, 25))
+    fig, axes = plt.subplots(1, 2, figsize=(50, 25))
     axes = axes.flatten()
-
-    # different_races_rate = ['Asian %', 'Black %', 'Hispanic %', 'White %']
-
-    # for r in different_races_rate:
-    #     race_state = sns.barplot(x=r, y='STATE_NAME',
-    #                              data=hatecrime_population_dataframe, ax=axes[0])
-    #     race_state.bar_label(race_state.containers[0])
 
     if race == 'asian':
         race_state = sns.barplot(x='Asian %', y='STATE_NAME',
@@ -162,14 +150,11 @@ def visualize_hatecrime_population(hatecrime_population_dataframe, race):
                                  data=hatecrime_population_dataframe, ax=axes[0])
         race_state.bar_label(race_state.containers[0])
 
+    hatecrime_population_dataframe = hatecrime_population_dataframe[hatecrime_population_dataframe['BIAS_DESC'] == 'Anti-Asian']
+
     po_victims_count_state = sns.barplot(x='VICTIMS COUNT', y='STATE_NAME',
                                          data=hatecrime_population_dataframe, ax=axes[1])
     po_victims_count_state.bar_label(po_victims_count_state.containers[0])
 
-    po_offender_race_count_state = sns.barplot(x='OFFENDER_RACE_COUNT', y='STATE_NAME',
-                                               data=hatecrime_population_dataframe, ax=axes[2])
-    po_offender_race_count_state.bar_label(po_offender_race_count_state.containers[0])
-
     plt.show()
     return plt
-
