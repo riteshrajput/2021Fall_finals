@@ -6,8 +6,6 @@
 1. Ritesh Rajput (GitHub ID: riteshrajput)
 2. Nishit Singh (GitHub ID: ns1601)
 
-## Background:
-![1 output](https://user-images.githubusercontent.com/89374199/167278841-ed88e9e7-3a98-4601-be07-6864f948553c.png)
 
 
 
