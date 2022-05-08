@@ -7,7 +7,8 @@
 2. Nishit Singh (GitHub ID: ns1601)
 
 ## Background:
-![image](https://user-images.githubusercontent.com/89374199/167278813-a336084f-783c-4544-9698-87d328730e73.png)
+![1 output](https://user-images.githubusercontent.com/89374199/167278841-ed88e9e7-3a98-4601-be07-6864f948553c.png)
+
 
 
 * “Asian Americans have long been subjected to bias in the United States. But anti-Asian bias attacks have taken a more violent turn since COVID became a reality for Americans under a president bent on scapegoating Asians for the pandemic.”
